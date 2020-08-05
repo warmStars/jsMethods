@@ -5,3 +5,7 @@
 const warmstars = require("warmstars");
 Vue.prototype.utils = warmstars;
 组件使用：this.utils
+## 3.安装
+npm i warmstars
+## 4.联系
+mr guan  1206024322@qq.com

@@ -1,5 +1,6 @@
 'use strict';
 const dayjs = require('dayjs');
+const axios = require('axios');
 exports.formatDateTime = function (date) {
     return dayjs(date).format('YYYY-MM-DD HH:mm:ss');
 };
@@ -91,4 +92,39 @@ exports.getUrlParam = function (name) {
     var r = window.location.search.substr(1).match(reg);
     if (r != null) return decodeURI(r[2]);
     return null;
+}
+exports.http = function (option) {
+    // axios.defaults.baseURL = option.url;
+    axios.defaults.timeout = 10000;
+    if (option.header) {
+        axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
+    } else {
+        axios.defaults.headers.post['Content-Type'] = 'application/json'
+    }
+    axios.interceptors.request.use(
+        config => {
+            return config;
+        },
+        error => {
+            return Promise.error(error);
+        })
+    axios.interceptors.response.use(
+        response => {
+            const code = response.data.code;
+            if (code === option.codeNumber) {
+                return Promise.resolve(response);
+            }
+        }, error => {
+            return Promise.reject(error.response);
+        })
+    if (option.method == 'get') {
+        return new Promise((resolve, reject) => {
+            axios.get(option.url, {})
+            .then(res => {
+                resolve(res.data);
+            }).catch(err => {
+                reject(err.data)
+            })
+        });
+    }
 }
